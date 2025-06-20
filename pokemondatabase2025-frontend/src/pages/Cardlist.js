@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function CardList() {
   const [cards, setCards] = useState([]);
   const [filter, setFilter] = useState("");
+  const navigate = useNavigate();
 
   const fetchCards = async () => {
     try {
@@ -34,9 +36,8 @@ function CardList() {
   };
 
   const viewDetails = (card) => {
-    alert(
-      `Viewing details for ${card.name}\nHP: ${card.hp}\nType: ${card.type?.name}\nSet: ${card.set?.name}`
-    );
+    
+    navigate(`/cards/${card.id}`, { state: { card } });
   };
 
   const filteredCards = cards.filter((card) =>

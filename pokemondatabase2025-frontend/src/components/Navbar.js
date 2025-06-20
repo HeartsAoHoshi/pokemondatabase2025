@@ -7,7 +7,7 @@ function Navbar() {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      background: "rgba(0, 0, 0, 0.7)",
+      background: "rgb(15, 0, 0)",
       padding: "16px 32px",
       borderBottom: "2px solid #ffcb05"
     },
@@ -29,7 +29,7 @@ function Navbar() {
 
   return (
     <nav style={styles.navbar}>
-      <h1 style={styles.title}>Pokémon TCG DB</h1>
+      <h1 style={styles.title}>Pokémon TCG DataBase</h1>
       <div style={styles.links}>
         <Link to="/" style={styles.link}>Home</Link>
         <Link to="/cards" style={styles.link}>Card List</Link>
