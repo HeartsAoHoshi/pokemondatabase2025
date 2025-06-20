@@ -14,19 +14,18 @@ db.init_app(app)
 def home():
     return {"message": "Pokemon TCG API"}
 
-# ✅ GET all cards
+
 @app.route("/api/cards", methods=["GET"])
 def get_all_cards():
     cards = Card.query.all()
     return jsonify([card.to_dict() for card in cards])
 
-# ✅ GET single card by ID
+
 @app.route("/api/cards/<int:id>", methods=["GET"])
 def get_card(id):
     card = Card.query.get_or_404(id)
     return jsonify(card.to_dict())
 
-# ✅ CREATE a new card
 @app.route("/api/cards", methods=["POST"])
 def create_card():
     data = request.get_json()
@@ -43,7 +42,7 @@ def create_card():
 
     return jsonify(new_card.to_dict()), 201
 
-# ✅ UPDATE an existing card
+
 @app.route("/api/cards/<int:id>", methods=["PUT"])
 def update_card(id):
     card = Card.query.get_or_404(id)
@@ -57,7 +56,7 @@ def update_card(id):
     db.session.commit()
     return jsonify(card.to_dict())
 
-# ✅ DELETE a card
+
 @app.route("/api/cards/<int:id>", methods=["DELETE"])
 def delete_card(id):
     card = Card.query.get_or_404(id)
@@ -65,7 +64,19 @@ def delete_card(id):
     db.session.commit()
     return {"message": f"Card {id} deleted."}, 200
 
-# ✅ Initialize the database
+
+@app.route("/api/types", methods=["GET"])
+def get_types():
+    types = Type.query.all()
+    return jsonify([t.to_dict() for t in types])
+
+
+@app.route("/api/sets", methods=["GET"])
+def get_sets():
+    sets = Set.query.all()
+    return jsonify([s.to_dict() for s in sets])
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

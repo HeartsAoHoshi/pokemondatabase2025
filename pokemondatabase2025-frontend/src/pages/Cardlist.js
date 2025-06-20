@@ -1,63 +1,89 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
-const Cardlist = () => {
+function CardList() {
   const [cards, setCards] = useState([]);
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
+
+  const fetchCards = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/cards");
+      const data = await response.json();
+      setCards(data);
+    } catch (error) {
+      console.error("Error fetching cards:", error);
+    }
+  };
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/cards")
-      .then((res) => res.json())
-      .then((data) => setCards(data))
-      .catch((err) => console.error(err));
+    fetchCards();
   }, []);
 
+  const deleteCard = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/cards/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        setCards(cards.filter((card) => card.id !== id));
+      } else {
+        alert("Failed to delete card");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+  };
+
+  const viewDetails = (card) => {
+    alert(
+      `Viewing details for ${card.name}\nHP: ${card.hp}\nType: ${card.type?.name}\nSet: ${card.set?.name}`
+    );
+  };
+
   const filteredCards = cards.filter((card) =>
-    card.name.toLowerCase().includes(search.toLowerCase())
+    card.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>All Pokémon Cards</h2>
-        <Link to="/cards/new" className="btn btn-success">
-          Add New Card
-        </Link>
-      </div>
-
+    <div>
+      <h2>Pokemon Cards</h2>
       <input
         type="text"
-        className="form-control mb-4"
-        placeholder="Search by name..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Filter cards by name..."
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%" }}
       />
-
-      <div className="row">
-        {filteredCards.map((card) => (
-          <div key={card.id} className="col-md-4 mb-4">
-            <div className="card h-100 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">{card.name}</h5>
-                <p className="card-text">HP: {card.hp}</p>
-                <p className="card-text">Type: {card.type?.name}</p>
-                <p className="card-text">Set: {card.set?.name}</p>
-                <Link to={`/cards/${card.id}`} className="btn btn-primary">
-                  View Details
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {filteredCards.length === 0 && (
-          <div className="col-12">
-            <p className="text-muted">No cards match your search.</p>
-          </div>
-        )}
-      </div>
+      {filteredCards.length === 0 ? (
+        <p>No cards found</p>
+      ) : (
+        <ul>
+          {filteredCards.map((card) => (
+            <li key={card.id} style={{ marginBottom: "1rem" }}>
+              <strong>{card.name}</strong> - HP: {card.hp} - Type: {card.type?.name} - Set:{" "}
+              {card.set?.name}
+              <br />
+              <button
+                onClick={() => viewDetails(card)}
+                style={{ marginRight: "10px", marginTop: "0.5rem" }}
+              >
+                View Details
+              </button>
+              <button
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete "${card.name}"?`)) {
+                    deleteCard(card.id);
+                  }
+                }}
+                style={{ marginTop: "0.5rem" }}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
+}
 
-export default Cardlist;
+export default CardList;

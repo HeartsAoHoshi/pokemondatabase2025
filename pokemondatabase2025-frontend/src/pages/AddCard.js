@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AddCard = () => {
@@ -9,8 +9,34 @@ const AddCard = () => {
     set_id: "",
   });
 
-  const navigate = useNavigate();
+  const [types, setTypes] = useState([]);
+  const [sets, setSets] = useState([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  
+  useEffect(() => {
+    const fetchTypesAndSets = async () => {
+      try {
+        const [typeRes, setRes] = await Promise.all([
+          fetch("http://localhost:5000/api/types"),
+          fetch("http://localhost:5000/api/sets"),
+        ]);
+
+        const [typeData, setData] = await Promise.all([
+          typeRes.json(),
+          setRes.json(),
+        ]);
+
+        setTypes(typeData);
+        setSets(setData);
+      } catch (err) {
+        console.error("Error fetching dropdown data:", err);
+      }
+    };
+
+    fetchTypesAndSets();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,7 +48,6 @@ const AddCard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Optional: Simple validation
     if (!formData.name || !formData.hp || !formData.type_id || !formData.set_id) {
       setError("Please fill out all fields.");
       return;
@@ -44,7 +69,7 @@ const AddCard = () => {
         setError(data.error || "Failed to add card.");
       }
     } catch (err) {
-      setError("Network error. Please try again later.");
+      setError("Try again.");
       console.error(err);
     }
   };
@@ -52,7 +77,7 @@ const AddCard = () => {
   return (
     <div className="container mt-4">
       <h2>Add New Pokémon Card</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="text-danger">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -63,7 +88,7 @@ const AddCard = () => {
             className="form-control"
             value={formData.name}
             onChange={handleChange}
-            placeholder="e.g., Pikachu"
+            placeholder="Pokémon name"
           />
         </div>
 
@@ -75,32 +100,42 @@ const AddCard = () => {
             className="form-control"
             value={formData.hp}
             onChange={handleChange}
-            placeholder="e.g., 60"
+            placeholder="HP stat"
           />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Type ID</label>
-          <input
-            type="number"
+          <label className="form-label">Card Type</label>
+          <select
             name="type_id"
-            className="form-control"
+            className="form-select"
             value={formData.type_id}
             onChange={handleChange}
-            placeholder="e.g., 1 (Electric)"
-          />
+          >
+            <option value="">Select a type</option>
+            {types.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Set ID</label>
-          <input
-            type="number"
+          <label className="form-label">Card Set</label>
+          <select
             name="set_id"
-            className="form-control"
+            className="form-select"
             value={formData.set_id}
             onChange={handleChange}
-            placeholder="e.g., 2 (Base Set)"
-          />
+          >
+            <option value="">Select a set</option>
+            {sets.map((set) => (
+              <option key={set.id} value={set.id}>
+                {set.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className="btn btn-success">
