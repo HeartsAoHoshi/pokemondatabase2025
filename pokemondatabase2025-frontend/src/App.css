@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
+  background-image: url('https://images.unsplash.com/photo-1600441994664-98327a26791a');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+  color: #333;
+  backdrop-filter: blur(4px);
+}
