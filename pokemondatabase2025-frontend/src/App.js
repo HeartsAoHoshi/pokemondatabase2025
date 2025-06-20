@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import Cardlist from "./pages/Cardlist";
 import Carddetail from "./pages/Carddetail";
-import AddCard from "./pages/AddCard"; 
+import AddCard from "./pages/AddCard";
 import Navbar from "./components/Navbar";
 import './App.css';
 

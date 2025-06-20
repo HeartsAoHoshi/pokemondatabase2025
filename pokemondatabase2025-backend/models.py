@@ -6,7 +6,7 @@ class Type(db.Model):
     __tablename__ = "types"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
-    
+
     cards = db.relationship("Card", backref="type", lazy=True)
 
     def to_dict(self):
@@ -35,6 +35,7 @@ class Card(db.Model):
     hp = db.Column(db.Integer)
     type_id = db.Column(db.Integer, db.ForeignKey("types.id"), nullable=False)
     set_id = db.Column(db.Integer, db.ForeignKey("sets.id"), nullable=False)
+    image_url = db.Column(db.String, nullable=True)
 
     def to_dict(self):
         return {
@@ -43,6 +44,7 @@ class Card(db.Model):
             "hp": self.hp,
             "type": self.type.to_dict() if self.type else None,
             "set": self.set.to_dict() if self.set else None,
+            "image_url": self.image_url,
             "type_id": self.type_id,
             "set_id": self.set_id
         }

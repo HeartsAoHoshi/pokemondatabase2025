@@ -7,14 +7,15 @@ const AddCard = () => {
     hp: "",
     type_id: "",
     set_id: "",
+    imageUrl: "",  // image URL field in form
   });
 
   const [types, setTypes] = useState([]);
   const [sets, setSets] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const fetchTypesAndSets = async () => {
       try {
@@ -49,9 +50,12 @@ const AddCard = () => {
     e.preventDefault();
 
     if (!formData.name || !formData.hp || !formData.type_id || !formData.set_id) {
-      setError("Please fill out all fields.");
+      setError("Please fill out all required fields.");
       return;
     }
+
+    setError("");
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/api/cards", {
@@ -59,7 +63,13 @@ const AddCard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          hp: Number(formData.hp), // convert hp to number
+          type_id: formData.type_id,
+          set_id: formData.set_id,
+          image_url: formData.imageUrl,  // fixed field name here
+        }),
       });
 
       if (response.ok) {
@@ -71,6 +81,8 @@ const AddCard = () => {
     } catch (err) {
       setError("Try again.");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -138,9 +150,39 @@ const AddCard = () => {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-success">
-          Add Card
-        </button>
+        {/* Image URL input */}
+        <div className="mb-3">
+          <label className="form-label">Image URL</label>
+          <input
+            type="text"
+            name="imageUrl"
+            className="form-control"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            placeholder="https://example.com/image.png"
+          />
+        </div>
+
+        <div className="d-flex">
+          <button type="submit" className="btn btn-success" disabled={loading}>
+            {loading ? "Adding..." : "Add Card"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger ms-2"
+            onClick={() =>
+              setFormData({
+                name: "",
+                hp: "",
+                type_id: "",
+                set_id: "",
+                imageUrl: "",
+              })
+            }
+          >
+            Clear
+          </button>
+        </div>
       </form>
     </div>
   );
